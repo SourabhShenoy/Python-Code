@@ -1,3 +1,6 @@
+#inorder, postorder,preorder,ways of representing trees and constructing a tree from them, use google code parsing method and similar methods, linked list to tree, tree to other DS
+
+
 import os
 
 class Node(object):

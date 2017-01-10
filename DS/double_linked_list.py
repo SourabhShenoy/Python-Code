@@ -1,22 +1,28 @@
-#usage: python3 single_linked_list.py
-#8.1,8.2,17,18,20,21,22,25,26
 import os
 import random
 
 class Node(object):
 
-	def __init__(self, data=None, next_node=None):
+	def __init__(self, data=None, next_node=None, prev_node=None):
 		self.data = data
 		self.next_node = next_node
+		self.prev_node = prev_node
 
 	def get_data(self):
 		return self.data
 
 	def get_next(self):
 		return self.next_node
-
+		
 	def set_next(self, new_next):
 		self.next_node = new_next
+
+	def get_prev(self):
+		return self.prev_node
+		
+	def set_prev(self, new_prev):
+		self.prev_node = new_prev
+
 
 class LinkedList(object):
 	def __init__(self, head=None):
@@ -25,217 +31,165 @@ class LinkedList(object):
 	def insert_beginning(self, data):
 		new_node = Node(data)
 		new_node.set_next(self.head)
-		self.head=new_node
-		print ("Inserted " + str(data))
+		new_node.set_prev(None)
+		if new_node.get_next():
+			new_node.get_next().set_prev(new_node)
+		self.head = new_node
+		print("Inserted: " + data)
 
 	def insert_middle(self, data, pos):
 		new_node = Node(data)
-		current = self.head
-		ct = 0
+		if self.head == None:
+			new_node.set_next(None)
+			new_node.set_prev(None)
+			self.head = new_node
+			print("Inserted first element: " + data)
+		else:
+			if int(pos) > self.size() or pos < 1:
+				print("Cant insert at position. Inserting at beginning")
+				self.insert_beginning(data)
+			else:
+				ct = 1
+				current = self.head
+				while ct < int(pos):
+					current = current.get_next()
+					ct += 1
+				current.get_next().set_prev(new_node)
+				new_node.set_next(current.get_next())
+				current.set_next(new_node)
+				new_node.set_prev(current)
+				print("Inserted: " + data)
+		self.display()
+				
+					
 
-		if current is None:
-			print ("Can't insert at given position! Inserting at the beginnning!")
-			self.insert_beginning(data)
-			return
-		pos = int(pos) - 1
-
-		while ct!= pos and current.get_next():
-			ct = ct + 1
-			current = current.get_next()
-
-		new_node.set_next(current.get_next())
-		current.set_next(new_node)
-		print ("Inserted " + str(data) + " at position " + str(ct+2))
 
 	def insert_end(self, data):
 		new_node = Node(data)
-		current = self.head
-
-		while current.get_next():
-			current = current.get_next()
-
-		current.set_next(new_node)
-		print ("Inserted " + str(data))
+		if self.head == None:
+			new_node.set_next(None)
+			new_node.set_prev(None)
+			self.head = new_node
+		else:
+			current = self.head
+			while current.get_next():
+				current = current.get_next()
+			current.set_next(new_node)
+			new_node.set_prev(current)
+		print("Inserted: " + data)			
+		
 
 
 	def size(self):
-		current = self.head
 		count = 0
+		current = self.head
 		while current:
-			count += 1
+			count+=1
 			current = current.get_next()
 		return count
 
-
 	def search(self, key):
 		current = self.head
-		found = False
-		ct = 0
-		while current and found is False:
-			ct += 1
-			if current.get_data() == key:
-				found = True
-			else:
+		pos = 1
+		if self.size():
+			while current:
+				if current.get_data() == key:
+					return key, pos
+					break
 				current = current.get_next()
-
-		if current is None:
-			return
+				pos += 1
+			return None,None
 		else:
-			return current, ct
+			return None,None
 
 	def display(self):
-		current = self.head
-		print ("List is:")
-		empty = 1
-		while current:
-			empty = 0
-			print (current.data,end=' ')
-			current = current.get_next()
-			if current is None:
-				print("")
-				return
-		if empty:
-			print("Empty")
-
+		if self.size():
+			current = self.head
+			while current:
+				print(current.data,end=' ')
+				current = current.get_next()
+			print("")
+		else:
+			print("Empty List")
 
 	def delete(self, data):
 		current = self.head
-		previous = None
 		found = False
-		while current and found is False:
-			if current.get_data() == data:
-				found = True
-			else:
-				previous = current
-				current = current.get_next()
-		if current is None:
+		if not self.size():
+			print("Empty List")
 			return
-		if previous is None:
-			self.head = current.get_next()
-		else:
-			previous.set_next(current.get_next())
-		print("Deleted " + str(data))
+		
+		while current:
+			if current.get_data() == data:
+				if current.get_prev() == None and current.get_next() == None:
+					print("Deleted last element: " + data)
+					self.head = None
+					found = True
+					break
+					
+				if current.get_prev() == None:
+					print("Deleted first element: " + data)
+					current.get_next().set_prev(None)
+					self.head = current.get_next()
+					current.set_next(None)
+					found = True
+					break
+
+				if current.get_next() == None:
+					print("Deleted last element: " + data)
+					current.get_prev().set_next(None)
+					current.set_prev(None)
+					found = True
+					break
+				
+				current.get_prev().set_next(current.get_next())
+				current.get_next().set_prev(current.get_prev())
+				print("Deleted from between: " + data)
+				found = True
+				break
+
+			current = current.get_next()
+		
+		if not found:
+			print("Does not exist")
 
 	def get_nth_node(self, n):
 		current = self.head
-		ct = 0
-		while ct < n - 1:
-			ct = ct + 1
-			if current.get_next():
-				current = current.get_next()
-			else:
-				print("Does not exist")
-		self.display()
-		print ("Node is " + str(current.get_data()))
-
-	def isempty(self):
-		if self.size() == 0:
-			print("List is empty")
-		else:
-			print("List is not empty")
-
-	def skipDelete(self,n,m):
-		current = self.head
-		while(current):
-			for i in range(1,m):
-				if current is None:
+		i = 0
+		n = int(n)
+		if n <= self.size() and self.size():
+			while current:
+				i += 1
+				if i == n:
+					print("Node is " + current.get_data())
 					return
 				current = current.get_next()
-
-			if current is None:
-				return
-
-			temp = current.get_next()
-
-			for i in range(1,n+1):
-				if temp is None:
-					break
-				temp = temp.get_next()
-
-			current.set_next(temp)
-			current = temp
-		self.display()
-
-	def printReverse(self, head):
-		if head is None:
-			return
 		else:
-			self.printReverse(head.get_next())
+			print("Can't find")
+			
+	def isempty(self):
+		return self.head == None
 
-		print(head.get_data(),end=' ')
+	def skipDelete(self,n,m):
+		pass
+		
+	def printReverse(self, head):
+		pass
 
 	def iterativeReverse(self):
-		prev = None
-		current = self.head
-
-		while current:
-			next = current.get_next()
-			current.set_next(prev)
-			prev = current
-			current = next
-		self.head = prev
+		pass
 
 	def recursiveReverse(self, p):
-	#https://www.youtube.com/watch?v=KYH83T4q6Vs
-		if p.get_next() is None:
-			self.head = p
-			return
-		else:
-			self.recursiveReverse(p.get_next())
-
-		q = p.get_next()
-		q.set_next(p)
-		p.set_next(None)
+		pass
 
 	def find_mid(self):
-		slow = self.head
-		fast = self.head
-
-		if self.head is None:
-			print("List empty")
-			return
-
-		while fast and fast.get_next():
-			fast = fast.get_next().get_next()
-			slow = slow.get_next()
-
-		print("Mid element is: " + slow.get_data())
+		pass
 
 	def last_to_first(self):
-		if self.head is None or self.head.get_next() is None:
-			print("Insufficient Nodes")
-			return
-		last = self.head
-		sec_last = None
+		pass
 
-		while last.get_next() is not None:
-			sec_last = last
-			last = last.get_next()
-
-		sec_last.set_next(None)
-		last.set_next(self.head)
-		self.head = last
-
-
-	#Aliter: http://www.geeksforgeeks.org/function-to-check-if-a-singly-linked-list-is-palindrome/
 	def ispalindrome(self,right):
-		global left
-		left = self.head
-		if right is None:
-			return
-		else:
-			res = self.ispalindrome(right.get_next())
-
-			if res == 0:
-				return 0
-
-		if left.get_data() == right.get_data():
-			res_1 = 1
-		else:
-			res_1 = 0
-		left = left.get_next()
-
-		return res_1
+		pass
 
 
 
@@ -243,7 +197,7 @@ def random_list(n):
 	list = LinkedList()
 	for i in range (1,int(n)+1):
 		data = random.randrange(1,100)
-		list.insert_beginning(data)
+		list.insert_beginning(str(data))
 	return list
 
 def print_info():
@@ -283,7 +237,7 @@ def print_info():
 def main():
 	os.system('clear')
 	list_1 = LinkedList()
-	print ("Single Linked List created")
+	print ("Double Linked List created")
 	print_info()
 	print ("Select your option")
 	option = input()
@@ -345,9 +299,9 @@ def main():
 		elif option == '12':
 			print("Enter value of n")
 			n = input()
-			list_1.get_nth_node(4)
+			list_1.get_nth_node(n)
 		elif option == '13':
-			list_1.isempty()
+			print(list_1.isempty())
 		elif option == '14':
 			ans = list_1.ispalindrome(list_1.head)
 			if ans:

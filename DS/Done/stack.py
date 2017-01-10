@@ -68,7 +68,7 @@ def random_stack(n):
 def queue_2stacks():
 	stack1 = []
 	stack2 = []
-	n = 0
+	n = 10
 	while n:
 		data = random.randrange(1,100)
 		stack1.append(data)
@@ -87,6 +87,7 @@ def queue_2stacks():
 	
 	try:
 		e = stack2.pop()
+		print(e)
 	except:
 		print("Stack empty")
 	
