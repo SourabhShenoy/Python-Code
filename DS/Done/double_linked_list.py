@@ -45,7 +45,7 @@ class LinkedList(object):
 			self.head = new_node
 			print("Inserted first element: " + data)
 		else:
-			if int(pos) > self.size() or pos < 1:
+			if int(pos) > self.size() or int(pos) < 1:
 				print("Cant insert at position. Inserting at beginning")
 				self.insert_beginning(data)
 			else:
@@ -54,11 +54,17 @@ class LinkedList(object):
 				while ct < int(pos):
 					current = current.get_next()
 					ct += 1
-				current.get_next().set_prev(new_node)
-				new_node.set_next(current.get_next())
-				current.set_next(new_node)
-				new_node.set_prev(current)
-				print("Inserted: " + data)
+				if not current.get_next():
+					current.set_next(new_node)
+					new_node.set_prev(current)
+					new_node.set_next(None)
+					print("Inserted: " + data)
+				else:
+					current.get_next().set_prev(new_node)
+					new_node.set_next(current.get_next())
+					current.set_next(new_node)
+					new_node.set_prev(current)
+					print("Inserted: " + data)
 		self.display()
 				
 					
