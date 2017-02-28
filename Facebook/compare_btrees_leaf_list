@@ -1,0 +1,58 @@
+compare list of leaves
+
+
+def compare(root1, root2):
+  if root1.left is None and root1.right is None and root2.left is None and root2.right is None:
+    if root1.data != root2.data:
+      return False
+    else:
+      return True
+
+  if root1.left and root2.left:
+    res1 = compare(root1.left,root2.left)
+  else:
+    return False
+  
+  if not res1:
+    return False
+  
+  if root1.right and root2.right:
+    res2 = compare(root1.right,root2.right)
+  else:
+    return False
+
+  return res1 and res2
+      
+compare(root1,root2)
+  
+Time Complexity: O(n)
+
+    1          2 
+  /   \      /  \
+  2    3    3    2
+  
+  false and false = false . compare(1,2)
+  false = compare(2,3)
+  False = compare(3,2)
+  
+
+    1          2 
+  /   \      /  \
+  2    3    2    3
+
+True and True = True = compare(1,2)
+True = compare(2,2)
+True = compare(3,3)
+
+
+
+    1          2 
+  /          /  \
+  2         2    3
+
+
+compare(1,2)
+res1 = True = compare(2,2)
+res2 = False
+
+True and False = False
